@@ -1,14 +1,30 @@
 'use strict';
 
-const uuid = require('uuid/v1');
+import mongoose from 'mongoose';
 
-class Song {
-  constructor(title, genre, artist) {
-    this.id = uuid();
-    this.artist = artist;
-    this.title = title;
-    this.genre = genre;
-  }
-}
+const songSchema = mongoose.Schema({
+  title: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+  artist: {
+    type: Number,
+    required: true,
+  },
+  songLength: {
+    type: Number,
+    required: false,
+  },
 
-module.exports = Song;
+  songs: [
+    {
+      type: mongoose.Schema.Types.ObjectId, ref: 'song',
+    },
+  ],
+}, {
+
+  usePushEach: true,
+});
+
+export default mongoose.model('song', songSchema);
