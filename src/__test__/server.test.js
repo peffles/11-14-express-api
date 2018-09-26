@@ -7,7 +7,7 @@ const superagent = require('superagent');
 const server = require('../lib/server');
 
 const API_URL = `http://localhost:${process.env.PORT}/api/songs`;
-describe(' testing routes for /api/songs', () => {
+describe('testing routes for /api/songs', () => {
   beforeAll(server.start);
   afterAll(server.stop);
   // **This test keep giving back 'undefined, cant seem to figure it out, may need help tomorrow**'
