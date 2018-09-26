@@ -7,7 +7,7 @@ const superagent = require('superagent');
 const server = require('../lib/server');
 
 const API_URL = `http://localhost:${process.env.PORT}/api/songs`;
-describe('/api/songs', () => {
+describe('testing routes for /api/songs', () => {
   beforeAll(server.start);
   afterAll(server.stop);
   test('should respond with 200 status code when a new song is posted', () => {
