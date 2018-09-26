@@ -5,12 +5,16 @@ require('dotenv').config();
 const express = require('express');
 const songRoutes = require('../routes/song-router');
 const logger = require('./logger');
+const errorMiddleware = require('./error-middleware');
+const loggerMiddleware = require('./logger-middleware');
 
 const app = express();
 
 const PORT = process.env.port || 8080;
 
+app.use(loggerMiddleware);
 app.use(songRoutes);
+app.use(errorMiddleware);
 
 app.all('*', (request, response) => {
   logger.log(logger.INFO, '404 | Triggered the catch all route!');

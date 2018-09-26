@@ -1,5 +1,6 @@
 'use strict';
 
+const HttpError = require('http-errors');
 const express = require('express');
 const bodyParser = require('body-parser');
 const logger = require('../lib/logger');
@@ -11,19 +12,16 @@ const jsonParser = bodyParser.json();
 const storeById = [];
 const storeByHash = {};
 
-router.post('/api/songs', jsonParser, (request, response) => {
+router.post('/api/songs', jsonParser, (request, response, next) => {
   logger.log(logger.INFO, 'Processing POST request on /api/songs');
   if (!request.body) {
-    logger.log(logger.INFO, '400 | Body is required!');
-    return response.sendStatus(400);
+    return next(new HttpError(400, 'Body is required'));
   }
   if (!request.body.artist) {
-    logger.log(logger.INFO, '400 | Artist is required!');
-    return response.sendStatus(400);
+    return next(new HttpError(400, 'Artist is required'));
   }
   if (!request.body.title) {
-    logger.log(logger.INFO, '400 | Song title is required!');
-    return response.sendStatus(400);
+    return next(new HttpError(400, 'Song Title is required'));
   }
   const song = new Song(request.body.artist, request.body.title);
   storeById.push(song.id);
@@ -32,22 +30,20 @@ router.post('/api/songs', jsonParser, (request, response) => {
   return response.json(song);
 });
 
-router.get('/api/songs/:id', (request, response) => {
+router.get('/api/songs/:id', (request, response, next) => {
   logger.log(logger.INFO, `Getting song with ID: ${request.params.id}`);
   if (storeByHash[request.params.id]) {
     return response.json(storeByHash[request.params.id]).sendStatus(200);
   }
-  logger.log(logger.INFO, '404 | No song with that ID was found');
-  return response.sendStatus(404);
+  return next(new HttpError(404, 'No song with that ID was found!'));
 });
 
-router.delete('/api/songs/:id', (request, response) => {
+router.delete('/api/songs/:id', (request, response, next) => {
   logger.log(logger.INFO, `Deleting song with ID: ${request.params.id}`);
   if (storeByHash[request.params.id]) {
     delete storeByHash[request.params.id];
     logger.log(logger.INFO, '200 | Requested song has been removed from storage');
     return response.json(storeByHash);
   }
-  logger.log(logger.INFO, '404 | No song found!');
-  return response.status(404).json(storeByHash);
+  return next(new HttpError(404, 'Song not found!'));
 });
