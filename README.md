@@ -1,7 +1,7 @@
 # Lab 11 - Express
 **Author**: Wyatt Pefey
 **Version**: 1.0.0
-## Build Status: 
+## Build Status: [![Build Status](https://travis-ci.com/peffles/11-14-express-api.svg?branch=master)](https://travis-ci.com/peffles/11-14-express-api)
 ___
 ## Overview
 For this lab I used express to make requests to a songs API. 
