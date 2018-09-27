@@ -30,7 +30,7 @@
 * POST `/api/songs`
   * If the route is successful, the server will respond with a 200 status code and the created resource
   * If the server fails due to a bad request, it will return a 400 status code
-* GET `/api/streer/:id`
+* GET `/api/songs/:id`
   * If the resource is found the server will return the resource and a 200 status code.  
   * if during a GET request the specific id in not found the server will return a 404 status code.
 * PUT `/api/songs/:id`
