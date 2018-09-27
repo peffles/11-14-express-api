@@ -1,22 +1,16 @@
 'use strict';
 
-import mongoose from 'mongoose';
+const mongoose = require('mongoose');
 
 const songSchema = mongoose.Schema({
+  artist: {
+    type: String,
+    required: true,
+  },
   title: {
     type: String,
     required: true,
-    unique: true,
   },
-  artist: {
-    type: Number,
-    required: true,
-  },
-  songLength: {
-    type: Number,
-    required: false,
-  },
-
   songs: [
     {
       type: mongoose.Schema.Types.ObjectId, ref: 'song',
@@ -27,4 +21,4 @@ const songSchema = mongoose.Schema({
   usePushEach: true,
 });
 
-export default mongoose.model('song', songSchema);
+module.exports = mongoose.model('song', songSchema);

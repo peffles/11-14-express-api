@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "eslint . && jest --coverage",
-    "jest": "jest --coverage"
+    "lint": "eslint .",
+    "dbon": "mkdir -p ./db && mongod --dbpath ./db",
+    "dboff": "killall mongod"
   },
   "repository": {
     "type": "git",

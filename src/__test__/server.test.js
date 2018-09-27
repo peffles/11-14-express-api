@@ -6,94 +6,108 @@ const faker = require('faker');
 const superagent = require('superagent');
 const server = require('../lib/server');
 
+const songMock = require('./lib/song-mock');
+
 const API_URL = `http://localhost:${process.env.PORT}/api/songs`;
-describe('testing routes for /api/songs', () => {
+
+// ___________________________________________________________________________
+// | ESLINT FREAKS OUT ABOUT THE UNDERSCORE IN THE "_id", hence the disables..|
+// | "No Underscore Dangle"                                                   |
+// |__________________________________________________________________________|
+
+describe('Testing routes for /api/songs', () => {
   beforeAll(server.start);
   afterAll(server.stop);
-  // **This test keep giving back 'undefined, cant seem to figure it out, may need help tomorrow**'
-  //   test('should respond with 200 status code when a new song is posted', () => {
-  //     return superagent.post(API_URL)
-  //       .set('Content-Type', 'application/json')
-  //       .send({
-  //         artist: 'Artist',
-  //         title: 'Some Song',
-  //       })
-  //       .then((response) => {
-  //         expect(response.status).toEqual(200);
-  //         expect(response.body.id).toBeTruthy();
-  //         expect(response.body.artist).toEqual('Artist');
-  //         expect(response.body.title).toEqual('Some Song');
-  //       });
-  //   });
-  test('Should respond with a 400 status code if there is no artist', () => {
-    return superagent.post(API_URL)
-      .set('Content-Type', 'application/json')
-      .send({
-        title: 'Some Song',
-      })
-      .then(Promise.reject)
-      .catch((response) => {
-        expect(response.status).toEqual(400);
-      });
-  });
-  test('Should respond with a 400 status code if there is no song title', () => {
-    return superagent.post(API_URL)
-      .set('Content-Type', 'application/json')
-      .send({
-        artist: 'Artist',
-      })
-      .then(Promise.reject)
-      .catch((response) => {
-        expect(response.status).toEqual(400);
-      });
-  });
+  beforeEach(songMock.pCleanSongMocks);
 
-  // THIS TEST EXPECTS A 2 WORD FAKER RESPONSE
-  // BUT RECEIVES A DIFFERENT 2 WORD FAKER RESPONSE CAUSING IT TO FAIL!!!
-  // test('should respond with a 200 status code and return song with faked data', () => {
-  //   const fakerRequest = {
-  //     title: faker.lorem.words(2),
-  //     artist: faker.lorem.words(2),
-  //   };
-  //   return superagent.post(API_URL)
-  //     .set('Content-Type', 'application/json')
-  //     .send(fakerRequest)
-  //     .then((postResponse) => {
-  //       fakerRequest.id = postResponse.body.id;
-  //       return superagent.get(`${API_URL}/${postResponse.body.id}`);
-  //     })
-  //     .then((getResponse) => {
-  //       expect(getResponse.status).toEqual(200);
-  //       expect(getResponse.body.id).toEqual(fakerRequest.id);
-  //       expect(getResponse.body.title).toEqual(fakerRequest.title);
-  //       expect(getResponse.body.artist).toEqual(fakerRequest.artist);
-  //     });
-  // });
-
-  test('should respond with 404 if  desired song to be removed is not found', () => {
-    return superagent.delete(`${API_URL}/thisWontwork`)
-      .then(Promise.reject)
-      .catch((getResponse) => {
-        expect(getResponse.status).toEqual(404);
-      });
-  });
-  // THIS FAKER REQUEST GOES THROUGH PERFECTLY WITH NO ERRORS BUT 
-  // OTHER ONE RECEIVES TOALLY DIFFERENT
-  // FAKER REPONSE, NEED TO FIND A FIX
-  test('should respond with 200 when a song is successfully removed from storage', () => {
+  test('POST | Should respond with 200 status code and a newly posted song', () => {
     const fakerRequest = {
-      title: faker.lorem.words(2),
-      artist: faker.lorem.words(2),
+      title: faker.lorem.words(1),
+      artist: faker.lorem.words(1),
     };
     return superagent.post(API_URL)
       .set('Content-Type', 'application/json')
       .send(fakerRequest)
-      .then((postResponse) => {
-        fakerRequest.id = postResponse.body.id;
-        return superagent.delete(`${API_URL}/${postResponse.body.id}`);
+      .then((response) => {
+        expect(response.status).toEqual(200);
+        expect(response.body.artist).toEqual(fakerRequest.artist);
+        expect(response.body.title).toEqual(fakerRequest.title);
+        expect(response.body._id.toString()).toBeTruthy(); //eslint-disable-line
+      });
+  });
+  test('POST | Should respond with a 400 status code if there is no artist', () => {
+    const fakerRequest = {
+      title: faker.lorem.words(2),
+    };
+    return superagent.post(API_URL)
+      .set('Content-Type', 'application/json')
+      .send(fakerRequest)
+      .then(Promise.reject)
+      .catch((response) => {
+        expect(response.status).toEqual(400);
+      });
+  });
+  test('POST | Should respond with a 400 status code if there is no song title', () => {
+    const fakerRequest = {
+      artist: faker.lorem.words(1),
+    };
+    return superagent.post(API_URL)
+      .set('Content-Type', 'application/json')
+      .send(fakerRequest)
+      .then(Promise.reject)
+      .catch((response) => {
+        expect(response.status).toEqual(400);
+      });
+  });
+
+  test('GET | Should respond with a 200 status code and return song with faked data', () => {
+    let savedSongMock = null;
+    return songMock.pCreateSongMock()
+      .then((SongMock) => {
+        savedSongMock = SongMock;
+        return superagent.get(`${API_URL}/${SongMock._id}`); //eslint-disable-line
       })
-      .then((getResponse) => {
-        expect(getResponse.status).toEqual(200);
+      .then((response) => {
+        expect(response.status).toEqual(200);
+        expect(response.body._id.toString()).toEqual(savedSongMock._id.toString()); //eslint-disable-line
+        expect(response.body.title).toEqual(savedSongMock.title);
+      });
+  });
+  test('GET | Should respond with 404 if there isnt a matching id in the database', () => {
+    return superagent.get(`${API_URL}/thisWontWork`)
+      .then(Promise.reject)
+      .catch((response) => {
+        expect(response.status)
+          .toEqual(404);
+      });
+  });
+  test('PUT | Should respond with 404 if no matching id is found', () => {
+    return superagent.put(`${API_URL}/thisWontWork`)
+      .then(Promise.reject)
+      .catch((response) => {
+        expect(response.status)
+          .toEqual(404);
+      });
+  });
+
+  test('DELETE/DESTROY | Should respond with 404 if desired song cannot be found in database', () => {
+    return superagent.delete(`${API_URL}/thisWontwork`)
+      .then(Promise.reject)
+      .catch((response) => {
+        expect(response.status).toEqual(404);
+      });
+  });
+  test('DELETE/DESTROY | Should respond with 200 when a song is successfully removed from database', () => {
+    let savedSongMock = null;
+    return songMock.pCreateSongMock()
+      .then((SongMock) => {
+        savedSongMock = SongMock;
+        return superagent.delete(`${API_URL}/${SongMock._id}`); //eslint-disable-line
+      })
+      .then((response) => {
+        expect(response.status).toEqual(200);
+        expect(response.body._id.toString()).toEqual(savedSongMock._id.toString()); //eslint-disable-line
+        expect(response.body.title).toEqual(savedSongMock.title);
       });
   });
 });

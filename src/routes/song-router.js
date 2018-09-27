@@ -9,41 +9,62 @@ const Song = require('../model/song');
 const router = module.exports = new express.Router();
 const jsonParser = bodyParser.json();
 
-const storeById = [];
-const storeByHash = {};
-
 router.post('/api/songs', jsonParser, (request, response, next) => {
-  logger.log(logger.INFO, 'Processing POST request on /api/songs');
-  if (!request.body) {
-    return next(new HttpError(400, 'Body is required'));
-  }
-  if (!request.body.artist) {
-    return next(new HttpError(400, 'Artist is required'));
-  }
-  if (!request.body.title) {
-    return next(new HttpError(400, 'Song Title is required'));
-  }
-  const song = new Song(request.body.artist, request.body.title);
-  storeById.push(song.id);
-  storeByHash[song.id] = song;
-  logger.log(logger.INFO, 'Responding with a 200 status code');
-  return response.json(song);
+  return new Song(request.body).save()
+    .then((savedSong) => {
+      logger.log(logger.INFO, 'Responding with a 200 status code');
+      return response.json(savedSong);
+    })
+    .catch(next);
 });
 
 router.get('/api/songs/:id', (request, response, next) => {
-  logger.log(logger.INFO, `Getting song with ID: ${request.params.id}`);
-  if (storeByHash[request.params.id]) {
-    return response.json(storeByHash[request.params.id]).sendStatus(200);
-  }
-  return next(new HttpError(404, 'No song with that ID was found!'));
+  return Song.findById(request.params.id)
+    .then((song) => {
+      if (song) {
+        logger.log(logger.INFO, 'Responding with a 200 status code and a newly posted song');
+        return response.json(song);
+      }
+      logger.log(logger.INFO, 'Responding with a 404 status code. Song not Found');
+      return next(new HttpError(404, 'song not found'));
+    })
+    .catch(next);
 });
-
 router.delete('/api/songs/:id', (request, response, next) => {
-  logger.log(logger.INFO, `Deleting song with ID: ${request.params.id}`);
-  if (storeByHash[request.params.id]) {
-    delete storeByHash[request.params.id];
-    logger.log(logger.INFO, '200 | Requested song has been removed from storage');
-    return response.json(storeByHash);
-  }
-  return next(new HttpError(404, 'Song not found!'));
+  return Song.findById(request.params.id)
+    .then((song) => {
+      if (song) {
+        logger.log(logger.INFO, 'Responding with a 200 for deleting the song from database');
+        return response.json(song);
+      }
+      logger.log(logger.INFO, 'Responding with a 404 status code. Song not Found in database');
+      return next(new HttpError(404, 'song not found in database'));
+    })
+    .catch(next);
+});
+router.put('/api/grocery-list/:id', jsonParser, (request, response, next) => {
+  return Song.findById(request.params.id)
+    .then((song) => {
+      if (!request.body) {
+        throw HttpError(400, 'Body is required!!!');
+      }
+      if (!song) {
+        throw HttpError(404, 'Song not found!');
+      }
+      if (request.body.artist) {
+        song.set({
+          artist: `${request.body.artist}`,
+        });
+      }
+      if (request.body.title) {
+        song.set({
+          title: `${request.body.title}`,
+        });
+      }
+      logger.log(logger.INFO, 'Responding with a 200 status code and an updated song');
+      return song.save()
+        .then(updatedSong => response.json(updatedSong))
+        .catch(next);
+    })
+    .catch(next);
 });

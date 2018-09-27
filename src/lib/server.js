@@ -2,6 +2,7 @@
 
 require('dotenv').config();
 
+const mongoose = require('mongoose');
 const express = require('express');
 const songRoutes = require('../routes/song-router');
 const logger = require('./logger');
@@ -25,13 +26,19 @@ const server = module.exports = {};
 let internalServer = null;
 
 server.start = () => {
-  internalServer = app.listen(PORT, () => {
-    logger.log(logger.INFO, `Server is up and listening at PORT: ${PORT}`);
-  });
+  return mongoose.connect(process.env.MONGODB_URI)
+    .then(() => {
+      return internalServer = app.listen(PORT, () => { // eslint-disable-line
+        logger.log(logger.INFO, `Server is up and listening at PORT: ${PORT}`);
+      });
+    });
 };
 
 server.stop = () => {
-  internalServer.close(() => {
-    logger.log(logger.INFO, 'Server OFFLINE');
-  });
+  return mongoose.disconnect()
+    .then(() => {
+      return internalServer.close(() => {
+        logger.log(logger.INFO, 'Server OFFLINE.');
+      });
+    });
 };
