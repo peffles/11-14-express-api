@@ -1,6 +1,7 @@
 ### Lab 13: Single Resource
 - by Wyatt Pefley
 ## Build Status: [![Build Status](https://travis-ci.com/peffles/11-14-express-api.svg?branch=master)](https://travis-ci.com/peffles/11-14-express-api)
+***TESTS PASSING LOCALLY BUT TRAVIS FAILS***
 # Overview
 - The objective of  this lab is to build a RESTful HTTP server using express and MongoDB with a model of our choosing.
 
