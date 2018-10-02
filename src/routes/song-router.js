@@ -42,7 +42,7 @@ router.delete('/api/songs/:id', (request, response, next) => {
     })
     .catch(next);
 });
-router.put('/api/grocery-list/:id', jsonParser, (request, response, next) => {
+router.put('/api/songs/:id', jsonParser, (request, response, next) => {
   return Song.findById(request.params.id)
     .then((song) => {
       if (!request.body) {
