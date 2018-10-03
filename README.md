@@ -1,10 +1,11 @@
-### Lab 13: Single Resource
+### Lab 14: Double Resource
 - by Wyatt Pefley
+***Need to fix song tests RENAMED SONG TEST FILE FOR TRAVIS***
 ## Build Status: 
 # Overview
-- The objective of  this lab is to build a RESTful HTTP server using express and MongoDB with a model of our choosing.
+- The objective of  this lab is to build a RESTful HTTP server using express and MongoDB with 2 models of our choosing.
 
-- The model in this assignment is songs, all requests will be made to my songs API and songs will noww be stored within a database.
+- The models in this assignment are albums and songs, all requests will be made to my albums API and songs and albums will now be stored within a database.
 
 ## Getting Started
 
@@ -27,16 +28,16 @@
 - Before starting the server you must launch MongoDB by entering `npm run dbon` into your console.
  
 ### Endpoints
-* POST `/api/songs`
+* POST `/api/albums`
   * If the route is successful, the server will respond with a 200 status code and the created resource
   * If the server fails due to a bad request, it will return a 400 status code
-* GET `/api/streer/:id`
+* GET `/api/albums/:id`
   * If the resource is found the server will return the resource and a 200 status code.  
   * if during a GET request the specific id in not found the server will return a 404 status code.
-* PUT `/api/songs/:id`
+* PUT `/api/albums/:id`
   * the PUT route will return the updated resource and a 200 status code 
   * if the specific id is not found the the server will respond with a 404 error code.
   * Any other invalid requests throw a 404.
-* DELETE `/api/songs/:id`
+* DELETE `/api/albums/:id`
   * if the provided id exists and the route successfully deletes the resource it will return a 204 status code.
   * if the provided id does not exist then the server will respond with a 404 error code.

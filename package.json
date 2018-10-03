@@ -4,7 +4,7 @@
   "description": "![cf](https://i.imgur.com/7v5ASc8.png) 11: Express ======",
   "main": "index.js",
   "scripts": {
-    "test": "eslint . && jest --coverage",
+    "test": "eslint . && jest --coverage --forceExit --runInBand",
     "lint": "eslint .",
     "dbon": "mkdir -p ./db && mongod --dbpath ./db",
     "dboff": "killall mongod"
