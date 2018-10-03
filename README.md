@@ -1,7 +1,7 @@
 ### Lab 14: Double Resource
 - by Wyatt Pefley
 ***Need to fix song tests RENAMED SONG TEST FILE FOR TRAVIS***
-## Build Status: 
+## Build Status: [![Build Status](https://travis-ci.com/peffles/11-14-express-api.svg?branch=wyatt-lab14)](https://travis-ci.com/peffles/11-14-express-api)
 # Overview
 - The objective of  this lab is to build a RESTful HTTP server using express and MongoDB with 2 models of our choosing.
 
