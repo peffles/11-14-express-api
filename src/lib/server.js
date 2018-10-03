@@ -4,6 +4,7 @@ require('dotenv').config();
 
 const mongoose = require('mongoose');
 const express = require('express');
+const albumRoutes = require('../routes/album-router');
 const songRoutes = require('../routes/song-router');
 const logger = require('./logger');
 const errorMiddleware = require('./error-middleware');
@@ -14,6 +15,7 @@ const app = express();
 const PORT = process.env.port || 8080;
 
 app.use(loggerMiddleware);
+app.use(albumRoutes);
 app.use(songRoutes);
 app.use(errorMiddleware);
 
